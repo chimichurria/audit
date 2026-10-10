@@ -11,7 +11,7 @@ function nextApp() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'init-'));
   spawnSync('git', ['init', '-q'], { cwd: dir });
   fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'demo', dependencies: { next: '15.0.0', '@supabase/supabase-js': '2.0.0' } }));
-  for (const f of ['app/page.tsx', 'app/(marketing)/precios/page.tsx', 'app/admin/page.tsx', 'app/login/page.tsx', 'app/productos/[id]/page.tsx', 'app/api/admin/usuarios/route.ts', 'app/api/webhook/meta/route.ts']) {
+  for (const f of ['app/page.tsx', 'app/(marketing)/precios/page.tsx', 'app/admin/page.tsx', 'app/login/page.tsx', 'app/productos/[id]/page.tsx', 'app/api/admin/usuarios/route.ts', 'app/api/webhook/meta/route.ts', 'app/admin/login/page.tsx', 'app/admin/auth/confirm/route.ts', 'app/auth/callback/route.ts', 'app/api/availability/route.ts']) {
     fs.mkdirSync(path.join(dir, path.dirname(f)), { recursive: true });
     fs.writeFileSync(path.join(dir, f), 'export default function P() { return null }\n');
   }
@@ -21,13 +21,15 @@ function nextApp() {
 test('init detecta rutas y protegidas; dryRun no escribe; write sí y es idempotente', () => {
   const dir = nextApp();
   const routes = detectRoutes(dir);
-  assert.deepEqual(routes.pages, ['/', '/admin', '/login', '/precios']);
-  assert.deepEqual(routes.apis, ['/api/admin/usuarios', '/api/webhook/meta']);
+  assert.deepEqual(routes.pages, ['/', '/admin', '/admin/login', '/login', '/precios']);
+  assert.deepEqual(routes.apis, ['/admin/auth/confirm', '/api/admin/usuarios', '/api/availability', '/api/webhook/meta', '/auth/callback']);
   const plan = initProject(dir);
   assert.equal(plan.stack.framework, 'next');
   assert.ok(plan.configs.journeys.accessChecks.some((c) => c.route === '/admin' && c.expect === 'denied'));
   assert.ok(plan.configs.journeys.accessChecks.some((c) => c.route === '/api/admin/usuarios'));
   assert.ok(!plan.configs.journeys.accessChecks.some((c) => c.route === '/api/webhook/meta'));
+  // rutas públicas a propósito (auth, callbacks, APIs públicas) nunca se esperan "denied"
+  for (const publica of ['/admin/login', '/login', '/admin/auth/confirm', '/auth/callback', '/api/availability']) assert.ok(!plan.configs.journeys.accessChecks.some((c) => c.route === publica), publica);
   assert.ok(!fs.existsSync(path.join(dir, 'ui-audit.config.json')));
   initProject(dir, { dryRun: false });
   for (const f of ['ui-audit.config.json', 'ui-audit.security.json', 'ui-audit.journeys.json']) assert.ok(fs.existsSync(path.join(dir, f)), f);

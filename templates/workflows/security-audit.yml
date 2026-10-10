@@ -22,7 +22,7 @@ jobs:
           curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks
           curl -sSfL -o /usr/local/bin/osv-scanner "https://github.com/google/osv-scanner/releases/download/v${OSV_VERSION}/osv-scanner_linux_amd64"
           chmod +x /usr/local/bin/osv-scanner
-      - run: npx -y @chimichurria/audit@0.2.0 security --tag ci
+      - run: npx -y @chimichurria/audit@0.2.1 security --tag ci
       - if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with: { name: security-audit, path: .security-audit/ci, retention-days: 14 }

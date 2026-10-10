@@ -1,17 +1,53 @@
 {
   "name": "@chimichurria/audit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Auditoría y corrección de UI/UX multi-dispositivo, seguridad (OWASP, Vercel, Supabase, supply chain) y flujos UX por perfil. CLI + plugin de Claude Code + servidor MCP (Claude, Codex, Cursor y más).",
   "type": "module",
   "license": "MIT",
   "author": "ChimichurrIA",
-  "repository": { "type": "git", "url": "git+https://github.com/chimichurria/audit.git" },
-  "keywords": ["ui", "ux", "mobile", "audit", "playwright", "accessibility", "security", "owasp", "personas", "mcp", "claude-code", "codex", "cursor"],
-  "engines": { "node": ">=20" },
-  "bin": { "ui-audit": "cli/ui-audit.mjs" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chimichurria/audit.git"
+  },
+  "keywords": [
+    "ui",
+    "ux",
+    "mobile",
+    "audit",
+    "playwright",
+    "accessibility",
+    "security",
+    "owasp",
+    "personas",
+    "mcp",
+    "claude-code",
+    "codex",
+    "cursor"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "ui-audit": "cli/ui-audit.mjs"
+  },
   "files": [
-    "cli/", "lib/", "mcp/", "scripts/", "config/", "templates/", "skills/", "agents/", "commands/", "rules/", "hooks/",
-    "adapters/", ".claude-plugin/", ".mcp.json", "AGENTS.md", "README.md", "LICENSE"
+    "cli/",
+    "lib/",
+    "mcp/",
+    "scripts/",
+    "config/",
+    "templates/",
+    "skills/",
+    "agents/",
+    "commands/",
+    "rules/",
+    "hooks/",
+    "adapters/",
+    ".claude-plugin/",
+    ".mcp.json",
+    "AGENTS.md",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "doctor": "node scripts/doctor.mjs",

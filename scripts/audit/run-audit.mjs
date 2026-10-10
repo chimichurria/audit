@@ -84,7 +84,7 @@ export async function runUiAudit({ projectDir = '.', config = {}, tag = today(),
   for (const d of staticDirs) {
     const root = path.resolve(projectDir, d);
     if (!fs.existsSync(root)) continue;
-    const r = scanTree(root, config.ignoreDirs ?? DEFAULT_IGNORE);
+    const r = scanTree(root, [...new Set([...DEFAULT_IGNORE, ...(config.ignoreDirs ?? [])])]);
     ignores += r.ignores;
     for (const f of r.findings) add({ source: 'static-scan', id: f.id, severity: f.severity, title: f.msg, where: `${path.posix.join(d, f.file)}:${f.line}`, fix: f.fix, evidence: f.evidence });
   }

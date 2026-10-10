@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { scanTree } from './security-scan.mjs';
+import { scanTree, DEFAULT_IGNORE } from './security-scan.mjs';
 import { checkHeaders } from './headers-check.mjs';
 import { readJson, countBySeverity, scoreOf, writeReport, findingsMarkdown, diffFindings, today, isMain } from '../../lib/common.mjs';
 import { loadPolicy, enforce } from '../../lib/policy.mjs';
@@ -44,7 +44,7 @@ export async function runSecurity({ projectDir = '.', config = {}, tag = today()
   const norm = (f) => findings.push({ owasp: [], where: '', fix: '', evidence: '', ...f });
 
   // 1) scan estático propio
-  const { findings: fs1, ignores } = scanTree(root, config.ignoreDirs);
+  const { findings: fs1, ignores } = scanTree(root, [...new Set([...DEFAULT_IGNORE, ...(config.ignoreDirs ?? [])])]);
   for (const f of fs1) norm({ source: 'security-scan', id: f.id, severity: f.severity, owasp: f.owasp, title: f.msg, where: `${f.file}:${f.line}`, evidence: f.evidence });
   tools['security-scan'] = 'ok';
   tools.ignores = String(ignores);

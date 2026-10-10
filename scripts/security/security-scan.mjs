@@ -2,6 +2,7 @@
 // Escaneo estático de seguridad (heurístico, sin dependencias). No reemplaza a Semgrep ni a gitleaks: los complementa.
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
 export const redact = (s) => (s.length <= 8 ? '****' : `${s.slice(0, 4)}…(${s.length} car.)`);
@@ -51,7 +52,7 @@ export const RULES = [
   { id: 'empty-catch', severity: 'P3', owasp: ['A10:2025'], re: /catch\s*(?:\([^)]*\))?\s*\{\s*\}/g, msg: 'Excepción tragada: falla en silencio (A10:2025, manejo de condiciones excepcionales).' }
 ];
 
-const AUTH_WORDS = /getUser|getSession|auth\(|requireAuth|verifyToken|jwt|authorization|cookies\(|createServerClient|currentUser|clerk|nextauth|getServerSession/i;
+const AUTH_WORDS = /getUser|getSession|auth\(|requireAuth|verifyToken|jwt|authorization|cookies\(|createServerClient|currentUser|clerk|nextauth|getServerSession|\b(?:require|assert|ensure|check|verify|with)(?:Auth|User|Staff|Admin|Role|Session|Permission|Access|Login|Owner)\w*\s*\(|\bget(?:Staff|Admin)Profile\s*\(/i;
 const VALIDATION_WORDS = /zod|safeParse|\.parse\(|valibot|yup|joi|v\.object/i;
 
 export const FILE_RULES = [
@@ -64,6 +65,12 @@ export const FILE_RULES = [
 
 const lineOf = (text, index) => text.slice(0, index).split('\n').length;
 
+// Las reglas de código solo aplican a código de aplicación: no a tests, documentación ni prompts de agentes.
+// Los secretos se buscan en todos los archivos de texto (también en tests y docs).
+const CODE_FILE = /\.(?:js|mjs|cjs|jsx|ts|tsx|html|vue|svelte|astro)$/;
+const TEST_FILE = /\.(?:test|spec)\.|(?:^|\/)(?:tests?|__tests__|__mocks__|fixtures|e2e)\//;
+const appCode = (f) => CODE_FILE.test(f) && !TEST_FILE.test(f);
+
 export function scanText(text, file = '') {
   const f = file.replaceAll('\\', '/');
   const lines = text.split('\n');
@@ -74,7 +81,7 @@ export function scanText(text, file = '') {
     if (!ignored(line, s.id)) hits.push({ id: s.id, severity: 'P0', owasp: ['A02:2025', 'A04:2025'], line, msg: `${s.label} en el código. Rotalo y purgá el historial.`, evidence: redact(s.value) });
   }
   for (const r of RULES) {
-    if (r.when && !r.when(f, text)) continue;
+    if (!appCode(f) || (r.when && !r.when(f, text))) continue;
     for (const m of text.matchAll(r.re)) {
       const line = lineOf(text, m.index);
       if (ignored(line, r.id)) continue;
@@ -82,6 +89,7 @@ export function scanText(text, file = '') {
     }
   }
   for (const r of FILE_RULES) {
+    if (r.id !== 'env-file' && !appCode(f)) continue;
     if (r.test(f, text)) hits.push({ id: r.id, severity: r.severity, owasp: r.owasp, line: 1, msg: r.msg, evidence: '' });
   }
   return hits.sort((a, b) => a.line - b.line);
@@ -90,15 +98,29 @@ export function scanText(text, file = '') {
 const EXT = /\.(?:js|mjs|cjs|ts|tsx|jsx|json|html|sql|ya?ml|toml|sh|py|md|mdx|txt)$|(?:^|\/)\.env(?:\..+)?$/;
 const SKIP_FILES = /(?:package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$/;
 
-export function scanTree(root, ignoreDirs = ['node_modules', '.next', '.git', 'dist', 'build', 'coverage', '.vercel']) {
+export const DEFAULT_IGNORE = ['node_modules', '.next', '.git', 'dist', 'build', 'coverage', '.vercel', '.codex', '.cursor', '.claude', '.agents', '.windsurf', '.ui-audit', '.security-audit', '.ux-audit', '.audit'];
+
+// Archivos y carpetas que git ignora (.env.local, builds, etc.): no se versionan, así que no son una fuga por commit.
+// Un .env trackeado por error NO está en esta lista y se sigue marcando.
+export function gitIgnoredPaths(root) {
+  const r = spawnSync('git', ['ls-files', '-z', '-o', '-i', '--exclude-standard', '--directory'], { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  if (r.status !== 0) return () => false;
+  const all = r.stdout.split('\0').filter(Boolean);
+  const dirs = all.filter((p) => p.endsWith('/'));
+  const files = new Set(all.filter((p) => !p.endsWith('/')));
+  return (rel) => files.has(rel) || dirs.some((d) => rel.startsWith(d));
+}
+
+export function scanTree(root, ignoreDirs = DEFAULT_IGNORE) {
   const findings = [];
   const ignoreCount = { n: 0 };
+  const isIgnored = gitIgnoredPaths(root);
   const walk = (dir) => {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, e.name);
       if (e.isDirectory()) { if (!ignoreDirs.includes(e.name)) walk(full); continue; }
       const rel = path.relative(root, full).replaceAll('\\', '/');
-      if (!EXT.test(rel) || SKIP_FILES.test(rel)) continue;
+      if (!EXT.test(rel) || SKIP_FILES.test(rel) || isIgnored(rel)) continue;
       if (fs.statSync(full).size > 1_500_000) continue;
       const text = fs.readFileSync(full, 'utf8');
       ignoreCount.n += (text.match(/security-audit-ignore:/g) ?? []).length;
