@@ -43,7 +43,7 @@ export function scanText(text, file = '') {
 }
 
 const EXT = /\.(?:html|jsx|tsx|js|ts|vue|svelte|astro|css|scss|sass|less)$/;
-export const DEFAULT_IGNORE = ['node_modules', '.next', '.git', 'dist', 'build', 'coverage', '.vercel', '.ui-audit', '.security-audit', '.ux-audit', '.audit', 'out'];
+export const DEFAULT_IGNORE = ['node_modules', '.next', '.git', 'dist', 'build', 'coverage', '.vercel', '.ui-audit', '.security-audit', '.ux-audit', '.audit', 'out', '.codex', '.cursor', '.claude', '.agents', '.windsurf'];
 
 export function scanTree(root, ignoreDirs = DEFAULT_IGNORE) {
   const findings = [];

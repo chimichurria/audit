@@ -42,7 +42,7 @@ Comandos: `/ui-audit:init`, `/ui-audit:full`, `/ui-audit:security`, `/ui-audit:u
 ### Codex
 
 ```bash
-codex mcp add ui-audit -- npx -y @chimichurria/audit@0.2.0 mcp
+codex mcp add ui-audit -- npx -y @chimichurria/audit@0.2.1 mcp
 ```
 
 Subí el timeout de herramientas en `~/.codex/config.toml` (por defecto 60 s; las herramientas igual responden enseguida porque las auditorías corren como jobs):
@@ -55,13 +55,13 @@ tool_timeout_sec = 120
 Y en cada proyecto, para tener las skills (`.agents/skills/`) y el bloque de `AGENTS.md`:
 
 ```bash
-npx -y @chimichurria/audit@0.2.0 install codex --write
+npx -y @chimichurria/audit@0.2.1 install codex --write
 ```
 
 ### Cursor
 
 ```bash
-npx -y @chimichurria/audit@0.2.0 install cursor --write
+npx -y @chimichurria/audit@0.2.1 install cursor --write
 ```
 
 Escribe `.cursor/mcp.json`, `.cursor/rules/ui-audit.mdc`, `.agents/skills/` (Cursor también las lee) y el bloque de `AGENTS.md`. Habilitá el servidor en Settings → MCP.
@@ -69,7 +69,7 @@ Escribe `.cursor/mcp.json`, `.cursor/rules/ui-audit.mdc`, `.agents/skills/` (Cur
 ### Cualquier otro cliente MCP (Windsurf, VS Code/Copilot, Zed, Claude Desktop)
 
 ```json
-{ "mcpServers": { "ui-audit": { "command": "npx", "args": ["-y", "@chimichurria/audit@0.2.0", "mcp"] } } }
+{ "mcpServers": { "ui-audit": { "command": "npx", "args": ["-y", "@chimichurria/audit@0.2.1", "mcp"] } } }
 ```
 
 `ui-audit install all --write` configura Claude (`.mcp.json`), Codex y Cursor de una vez. Sin `--write` solo muestra lo que haría.
@@ -93,7 +93,7 @@ En Codex/Cursor: "auditá este proyecto con ui-audit" (usan la skill `app-audit-
 En la terminal o en CI:
 
 ```bash
-npx -y @chimichurria/audit@0.2.0 full --tag before
+npx -y @chimichurria/audit@0.2.1 full --tag before
 ```
 
 Comandos: `init [--write] [--force]`, `doctor [--security]`, `ui | security | ux [--tag t] [--offline] [--baseline t] [--zap]`, `full`, `diff <antes> <después>`, `auth <perfil>`, `branch`, `guard --staged | --file f`, `install <cliente> [--write]`, `mcp`. Exit code ≠ 0 si el estado no es `pass` (salvo `--no-fail`).

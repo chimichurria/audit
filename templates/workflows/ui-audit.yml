@@ -16,7 +16,7 @@ jobs:
       - run: npx -y playwright@1.64.0 install --with-deps chromium webkit
       # Opción A: dev server local. Opción B: AUDIT_BASE_URL con la URL del preview (y el bypass como secreto).
       - run: npm run build && (npm run start &) && npx -y wait-on@8 http://localhost:3000
-      - run: npx -y @chimichurria/audit@0.2.0 ui --tag ci
+      - run: npx -y @chimichurria/audit@0.2.1 ui --tag ci
         env:
           AUDIT_BASE_URL: http://localhost:3000
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
