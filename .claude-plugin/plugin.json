@@ -1,0 +1,9 @@
+{
+  "name": "ui-audit",
+  "version": "0.2.0",
+  "description": "Auditoría y corrección de UI/UX multi-dispositivo, seguridad (OWASP, Vercel, Supabase, supply chain) y flujos UX por perfil, con loop medible.",
+  "author": { "name": "ChimichurrIA" },
+  "license": "MIT",
+  "repository": "https://github.com/chimichurria/audit",
+  "keywords": ["ui", "ux", "mobile", "audit", "playwright", "accessibility", "security", "owasp", "personas"]
+}

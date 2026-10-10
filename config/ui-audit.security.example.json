@@ -1,0 +1,16 @@
+{
+  "baseUrl": "https://TU-PREVIEW.vercel.app",
+  "routes": ["/", "/login"],
+  "allowedHosts": ["localhost", "127.0.0.1", "mi-proyecto-*.vercel.app", "mi-dominio.com"],
+  "policy": {
+    "offlineOnly": false,
+    "fixAllowed": true,
+    "productionHosts": ["mi-dominio.com"]
+  },
+  "scanDir": ".",
+  "requiredTools": ["gitleaks", "osv-scanner"],
+  "semgrepConfigs": ["p/owasp-top-ten", "p/typescript"],
+  "zap": { "enabled": false, "minutes": 1 },
+  "ignoreDirs": ["node_modules", ".next", ".git", "dist", "build", "coverage", ".vercel", ".ui-audit", ".security-audit", ".ux-audit", ".audit"],
+  "sensitivePaths": ["/.env", "/.git/HEAD"]
+}

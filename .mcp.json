@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ui-audit": {
+      "command": "npx",
+      "args": ["-y", "@chimichurria/audit@0.2.0", "mcp"]
+    }
+  }
+}
