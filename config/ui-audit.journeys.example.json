@@ -1,0 +1,45 @@
+{
+  "baseUrl": "https://TU-PREVIEW.vercel.app",
+  "allowedHosts": ["localhost", "mi-proyecto-*.vercel.app"],
+  "loginPathRegex": "login|signin|sign-in|auth",
+  "personas": [
+    { "id": "visitante", "label": "Visitante anónimo (celular)", "devices": ["iPhone 13", "Pixel 7", "Desktop Chrome 1440"], "auth": null },
+    { "id": "cliente", "label": "Cliente con cuenta", "devices": ["iPhone 13"],
+      "auth": { "storageState": ".auth/cliente.json", "loginUrl": "/login", "emailSelector": "input[type=email]", "passwordSelector": "input[type=password]", "submitSelector": "button[type=submit]", "emailEnv": "TEST_CLIENTE_EMAIL", "passwordEnv": "TEST_CLIENTE_PASSWORD" } },
+    { "id": "admin", "label": "Admin", "devices": ["iPad Pro 11", "Desktop Chrome 1440"],
+      "auth": { "storageState": ".auth/admin.json", "loginUrl": "/login", "emailSelector": "input[type=email]", "passwordSelector": "input[type=password]", "submitSelector": "button[type=submit]", "emailEnv": "TEST_ADMIN_EMAIL", "passwordEnv": "TEST_ADMIN_PASSWORD" } }
+  ],
+  "journeys": [
+    {
+      "id": "contacto",
+      "persona": "visitante",
+      "goal": "Enviar una consulta desde el celular",
+      "budget": { "maxInteractions": 6, "maxMs": 30000 },
+      "steps": [
+        { "action": "goto", "url": "/" },
+        { "action": "click", "selector": "text=Contacto" },
+        { "action": "fill", "selector": "input[name=nombre]", "value": "{{TEST_GUEST_NAME}}" },
+        { "action": "fill", "selector": "input[name=email]", "value": "{{TEST_GUEST_EMAIL}}" },
+        { "action": "click", "selector": "button[type=submit]", "submit": true },
+        { "action": "expectVisible", "selector": "text=Gracias" }
+      ]
+    },
+    {
+      "id": "mi-cuenta",
+      "persona": "cliente",
+      "goal": "Ver mis pedidos",
+      "budget": { "maxInteractions": 3, "maxMs": 15000 },
+      "steps": [
+        { "action": "goto", "url": "/cuenta" },
+        { "action": "expectVisible", "selector": "text=Pedidos" }
+      ]
+    }
+  ],
+  "accessChecks": [
+    { "persona": "visitante", "type": "page", "route": "/admin", "expect": "denied", "markers": ["Panel de administración"] },
+    { "persona": "visitante", "type": "api", "route": "/api/admin/usuarios", "expect": "denied" },
+    { "persona": "cliente", "type": "page", "route": "/admin", "expect": "denied", "markers": ["Panel de administración"] },
+    { "persona": "cliente", "type": "page", "route": "/cuenta", "expect": "allowed" },
+    { "persona": "admin", "type": "page", "route": "/admin", "expect": "allowed" }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "chimichurria",
+  "description": "Plugins de ChimichurrIA",
+  "owner": { "name": "ChimichurrIA" },
+  "plugins": [
+    {
+      "name": "ui-audit",
+      "source": "./",
+      "description": "Auditoría y corrección de UI multi-dispositivo, seguridad y flujos UX por perfil (skills, agentes, hooks y MCP)."
+    }
+  ]
+}

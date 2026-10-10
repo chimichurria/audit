@@ -1,0 +1,8 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "allowedHosts": ["localhost", "127.0.0.1", "mi-proyecto-*.vercel.app"],
+  "routes": ["/", "/login"],
+  "devices": ["iPhone SE", "iPhone 13", "Pixel 7", "iPad Pro 11", "Desktop Chrome 1440"],
+  "staticDirs": ["app", "components", "styles"],
+  "waitMs": 600
+}

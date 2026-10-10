@@ -1,0 +1,6 @@
+body { margin: 0; font-family: sans-serif; font-size: 16px; color: #111; background: #fff; }
+main { padding: 16px; max-width: 640px; margin: 0 auto; }
+.hero { width: 100%; max-width: 900px; min-height: 40dvh; background: #eee; margin: 0; }
+input { font-size: 16px; min-height: 44px; width: 100%; box-sizing: border-box; }
+.btn { min-height: 44px; min-width: 44px; padding: 0 16px; font-size: 16px; }
+.btn:focus-visible { outline: 3px solid #1a5fd0; }
