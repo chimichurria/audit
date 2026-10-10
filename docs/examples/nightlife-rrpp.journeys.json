@@ -1,0 +1,41 @@
+{
+  "baseUrl": "https://TU-PREVIEW.vercel.app",
+  "allowedHosts": ["localhost", "mi-proyecto-*.vercel.app"],
+  "loginPathRegex": "login|signin|sign-in|auth",
+  "personas": [
+    { "id": "visitante", "label": "Visitante anónimo (celular)", "devices": ["iPhone 13", "Pixel 7", "Desktop Chrome 1440"], "auth": null },
+    { "id": "rrpp", "label": "RRPP (promotor)", "devices": ["iPhone 13", "Pixel 7"],
+      "auth": { "storageState": ".auth/rrpp.json", "loginUrl": "/login", "emailSelector": "input[type=email]", "passwordSelector": "input[type=password]", "submitSelector": "button[type=submit]", "emailEnv": "TEST_RRPP_EMAIL", "passwordEnv": "TEST_RRPP_PASSWORD" } },
+    { "id": "admin", "label": "Admin del local", "devices": ["iPad Pro 11", "Desktop Chrome 1440"],
+      "auth": { "storageState": ".auth/admin.json", "loginUrl": "/login", "emailSelector": "input[type=email]", "passwordSelector": "input[type=password]", "submitSelector": "button[type=submit]", "emailEnv": "TEST_ADMIN_EMAIL", "passwordEnv": "TEST_ADMIN_PASSWORD" } }
+  ],
+  "journeys": [
+    {
+      "id": "reservar-mesa", "persona": "visitante", "goal": "Reservar una mesa desde el celular",
+      "budget": { "maxInteractions": 8, "maxMs": 45000 },
+      "steps": [
+        { "action": "goto", "url": "/" },
+        { "action": "click", "selector": "text=Reservar" },
+        { "action": "fill", "selector": "input[name=nombre]", "value": "{{TEST_GUEST_NAME}}" },
+        { "action": "fill", "selector": "input[name=whatsapp]", "value": "{{TEST_GUEST_PHONE}}" },
+        { "action": "click", "selector": "button[type=submit]", "submit": true },
+        { "action": "expectVisible", "selector": "text=confirmad" }
+      ]
+    },
+    {
+      "id": "ver-mis-ventas", "persona": "rrpp", "goal": "Ver mis ventas y mi posición en el ranking",
+      "budget": { "maxInteractions": 4, "maxMs": 20000 },
+      "steps": [
+        { "action": "goto", "url": "/dashboard" },
+        { "action": "expectVisible", "selector": "text=Ranking" }
+      ]
+    }
+  ],
+  "accessChecks": [
+    { "persona": "visitante", "type": "page", "route": "/admin", "expect": "denied", "markers": ["Panel de administración"] },
+    { "persona": "visitante", "type": "api", "route": "/api/rrpp", "expect": "denied" },
+    { "persona": "rrpp", "type": "page", "route": "/admin", "expect": "denied", "markers": ["Panel de administración"] },
+    { "persona": "rrpp", "type": "page", "route": "/dashboard", "expect": "allowed" },
+    { "persona": "admin", "type": "page", "route": "/admin", "expect": "allowed" }
+  ]
+}
